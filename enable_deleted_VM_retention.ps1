@@ -6,3 +6,5 @@ foreach ($job in Get-VBRJob){
     $options.BackupStorageOptions.RetainDays = 5
     $job.SetOptions($options) | Out-Null
     }
+
+#modifica
