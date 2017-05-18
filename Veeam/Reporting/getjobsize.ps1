@@ -57,11 +57,11 @@ function getBackupInfo()
 
 		# format record into an array and save it into the global data array
 		$newEntry = New-Object -TypeName PSObject
-        	$newEntry | Add-Member -Name 'Job' -Membertype NoteProperty -Value $jobName
+        $newEntry | Add-Member -Name 'Job' -Membertype NoteProperty -Value $jobName
 		$newEntry | Add-Member -Name 'VMs' -MemberType Noteproperty -Value $vms
-        	$newEntry | Add-Member -Name 'jobBackupSize' -MemberType Noteproperty -Value $jobBackupSize
-        	$newEntry | Add-Member -Name 'jobDataSize' -MemberType Noteproperty -Value $jobDataSize
-        	$newEntry | Add-Member -Name 'amountVMs' -MemberType Noteproperty -Value $amountVMs
+        $newEntry | Add-Member -Name 'jobBackupSize' -MemberType Noteproperty -Value $jobBackupSize
+        $newEntry | Add-Member -Name 'jobDataSize' -MemberType Noteproperty -Value $jobDataSize
+        $newEntry | Add-Member -Name 'amountVMs' -MemberType Noteproperty -Value $amountVMs
 		$global:newBackupData += $newEntry;
 
 		# now do something with these stats! :-)
