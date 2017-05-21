@@ -36,6 +36,7 @@ def handle(msg):
 
 bot = telepot.Bot('350131512:AAFbqKgcn9i2cR597QfcxE_vrrA7GQL8F54')
 bot.message_loop(handle)
+GPIO.output(pin,GPIO.LOW)
 print 'I am listening...'
 
 try:
