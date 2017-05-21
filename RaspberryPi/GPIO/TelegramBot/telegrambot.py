@@ -26,6 +26,8 @@ def handle(msg):
         bot.sendMessage(chat_id, on(27))
     elif command =='Off':
         bot.sendMessage(chat_id, off(27))
+    else:
+        bot.sendMessage(chat_id, 'Command not found')
 
 bot = telepot.Bot('350131512:AAFbqKgcn9i2cR597QfcxE_vrrA7GQL8F54')
 bot.message_loop(handle)
