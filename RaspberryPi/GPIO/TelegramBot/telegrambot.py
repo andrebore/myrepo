@@ -36,7 +36,7 @@ def handle(msg):
     else:
         bot.sendMessage(chat_id, 'Command not found')
 
-bot = telepot.Bot('350131512:AAFbqKgcn9i2cR597QfcxE_vrrA7GQL8F54')
+bot = telepot.Bot('bot token')
 bot.message_loop(handle)
 GPIO.output(27,GPIO.LOW)
 print 'Waiting for command...'
