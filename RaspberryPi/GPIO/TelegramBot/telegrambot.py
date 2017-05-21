@@ -8,10 +8,12 @@ import RPi.GPIO as GPIO
 #LED
 def on(pin):
     GPIO.output(pin,GPIO.HIGH)
+    bot.sendMessage(chat_id, 'Led on')
     print 'Led on'
     return
 def off(pin):
     GPIO.output(pin,GPIO.LOW)
+    bot.sendMessage(chat_id, 'Led off')
     print 'Led off'
     return
 # to use Raspberry Pi board pin numbers
