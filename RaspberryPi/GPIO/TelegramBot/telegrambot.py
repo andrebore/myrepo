@@ -22,9 +22,9 @@ def handle(msg):
     command = msg['text']
     print 'Got command: %s' % command
 
-    if command == 'on':
+    if command == 'On':
         bot.sendMessage(chat_id, on(27))
-    elif command =='off':
+    elif command =='Off':
         bot.sendMessage(chat_id, off(27))
 
 bot = telepot.Bot('350131512:AAFbqKgcn9i2cR597QfcxE_vrrA7GQL8F54')
