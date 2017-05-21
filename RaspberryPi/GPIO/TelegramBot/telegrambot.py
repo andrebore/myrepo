@@ -11,11 +11,11 @@ def on(pin):
     return
 def off(pin):
     GPIO.output(pin,GPIO.LOW)
-    print 'Led off'
     return
-# to use Raspberry Pi board pin numbers
+
+# Use Raspberry PIN in BCM format
 GPIO.setmode(GPIO.BCM)
-# set up GPIO output channel
+# GPIO output channel
 GPIO.setup(27, GPIO.OUT)
 
 def handle(msg):
@@ -25,10 +25,12 @@ def handle(msg):
 
     if command == 'On':
         bot.sendMessage(chat_id, 'Led on')
+        bot.sendMessage(chat_id, 'Waiting for command...')
         print 'Led on'
         bot.sendMessage(chat_id, on(27))
     elif command =='Off':
         bot.sendMessage(chat_id, 'Led off')
+        bot.sendMessage(chat_id, 'Waiting for command...')
         print 'Led off'
         bot.sendMessage(chat_id, off(27))
     else:
@@ -37,7 +39,7 @@ def handle(msg):
 bot = telepot.Bot('350131512:AAFbqKgcn9i2cR597QfcxE_vrrA7GQL8F54')
 bot.message_loop(handle)
 GPIO.output(27,GPIO.LOW)
-print 'I am listening...'
+print 'Waiting for command...'
 
 try:
     while 1:
