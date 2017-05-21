@@ -24,8 +24,10 @@ def handle(msg):
 
     if command == 'On':
         bot.sendMessage(chat_id, on(27))
+        print 'Led on'
     elif command =='Off':
         bot.sendMessage(chat_id, off(27))
+        print 'Led off'
     else:
         bot.sendMessage(chat_id, 'Command not found')
 
