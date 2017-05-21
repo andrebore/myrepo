@@ -8,9 +8,11 @@ import RPi.GPIO as GPIO
 #LED
 def on(pin):
     GPIO.output(pin,GPIO.HIGH)
+    print 'Led on'
     return
 def off(pin):
     GPIO.output(pin,GPIO.LOW)
+    print 'Led off'
     return
 # to use Raspberry Pi board pin numbers
 GPIO.setmode(GPIO.BCM)
@@ -24,10 +26,8 @@ def handle(msg):
 
     if command == 'On':
         bot.sendMessage(chat_id, on(27))
-        print 'Led on'
     elif command =='Off':
         bot.sendMessage(chat_id, off(27))
-        print 'Led off'
     else:
         bot.sendMessage(chat_id, 'Command not found')
 
