@@ -1,6 +1,6 @@
 ﻿asnp VeeamPsSnapin
 
-$VSSCredentials = get-vbrcredentials -name "FGCORP\A10046"
+$VSSCredentials = get-vbrcredentials -name "user here!"
 
 
 foreach ($job in Get-VBRJob -name "Backup-*"){
