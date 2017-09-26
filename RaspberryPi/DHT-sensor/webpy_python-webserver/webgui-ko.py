@@ -6,7 +6,7 @@ import cgi
 import cgitb
 
 # global variables
-dbname='/home/andrea/dhtsensor/dhttrend_db/dhttrend.db' #path and db name here
+dbname='/home/andrea/dhtsensor/dhttrend_db/dhttrend.db'
 
 # print the HTTP header
 def printHTTPheader():
@@ -34,9 +34,9 @@ def get_data(interval):
     curs=conn.cursor()
 
     if interval == None:
-        curs.execute("SELECT timestamp,temp,humidity FROM trend")
+        curs.execute("SELECT * FROM trend")
     else:
-        curs.execute("SELECT timestamp,temp,humidity FROM trend WHERE timestamp>datetime('now','-%s hours') AND timestamp<=datetime('now')" % interval)
+        curs.execute("SELECT * FROM trend WHERE timestamp>datetime('now','-%s hours') AND timestamp<=datetime('now')" % interval)
 
     rows=curs.fetchall()
 
@@ -71,7 +71,7 @@ def print_graph_script(table):
       google.setOnLoadCallback(drawChart);
       function drawChart() {
         var data = google.visualization.arrayToDataTable([
-          ['Time', 'Temperature', 'Humidity'],
+          ['Time', 'Humidity', 'Temperature'],
 %s
         ]);
         var options = {
@@ -104,19 +104,18 @@ def show_stats(option):
 
     curs.execute("SELECT timestamp,max(temp) FROM trend WHERE timestamp>datetime('now','-%s hour') AND timestamp<=datetime('now')" % option)
     tempmax=curs.fetchone()
-    tempmax="{0}&nbsp&nbsp&nbsp{1}C".format(str(tempmax[0]),str(tempmax[1]))
+    tempmax="{0}&nbsp&nbsp&nbsp{1} %".format(str(tempmax[0]),str(tempmax[1]))
 
     curs.execute("SELECT timestamp,min(temp) FROM trend WHERE timestamp>datetime('now','-%s hour') AND timestamp<=datetime('now')" % option)
     tempmin=curs.fetchone()
-    tempmin="{0}&nbsp&nbsp&nbsp{1}C".format(str(tempmin[0]),str(tempmin[1]))
+    tempmin="{0}&nbsp&nbsp&nbsp{1} %".format(str(tempmin[0]),str(tempmin[1]))
 
     curs.execute("SELECT avg(temp) FROM trend WHERE timestamp>datetime('now','-%s hour') AND timestamp<=datetime('now')" % option)
     tempavg=curs.fetchone()
-    tempavg="{0}C".format(str(tempavg[0]))
 
     curs.execute("SELECT timestamp,max(humidity) FROM trend WHERE timestamp>datetime('now','-%s hour') AND timestamp<=datetime('now')" % option)
     humiditymax=curs.fetchone()
-    humiditymax="{0}&nbsp&nbsp&nbsp{1}%".format(str(humiditymax[0]),str(humiditymax[1]))
+    humiditymax="{0}&nbsp&nbsp&nbsp{1} C".format(str(humiditymax[0]),str(humiditymax[1]))
 
     curs.execute("SELECT timestamp,min(humidity) FROM trend WHERE timestamp>datetime('now','-%s hour') AND timestamp<=datetime('now')" % option)
     humiditymin=curs.fetchone()
@@ -124,7 +123,6 @@ def show_stats(option):
 
     curs.execute("SELECT avg(humidity) FROM trend WHERE timestamp>datetime('now','-%s hour') AND timestamp<=datetime('now')" % option)
     humidityavg=curs.fetchone()
-    humidityavg="{0}%".format(str(humidityavg[0]))
 
 
     print "<hr>"
@@ -132,29 +130,22 @@ def show_stats(option):
 
     print "<h2>Minumum Value&nbsp</h2>"
     print tempmin
-    print "<p></p>"
     print humiditymin
     print "<h2>Maximum Value</h2>"
     print tempmax
-    print "<p></p>"
     print humiditymax
-    #print "<h2>Average Value</h2>"
-    #print "%.1f" % tempavg+"C"
-    #print "<p></p>"
-    #print "%.1f" % humidityavg+"%"
     print "<h2>Average Value</h2>"
-    print tempavg
-    print "<p></p>"
-    print humidityavg
+    print "%.1f" % tempavg+"%"
+    print "%.1f" % humidityavg+"C"
     print "<hr>"
 
     print "<h2>In the last hour:</h2>"
     print "<table>"
     print "<tr><td><strong>Date/Time</strong></td><td><strong>Temperature</strong><td><strong>Humidity</strong></td></td></tr>"
 
-    rows=curs.execute("SELECT timestamp,temp,humidity FROM trend WHERE timestamp>datetime('now','-1 hour') AND timestamp<=datetime('now')")
+    rows=curs.execute("SELECT * FROM trend WHERE timestamp>datetime('now','-1 hour') AND timestamp<=datetime('now')")
     for row in rows:
-        tempstr="<tr><td>{0}&emsp;&emsp;</td><td>{1} C</td><td>{2} %</td></tr>".format(str(row[0]),str(row[1]),str(row[2]))
+        tempstr="<tr><td>{0}&emsp;&emsp;</td><td>{1} %</td><td>{2} C</td></tr>".format(str(row[0]),str(row[1]),str(row[2]))
         print tempstr
     print "</table>"
 
@@ -164,7 +155,7 @@ def show_stats(option):
 
 def print_time_selector(option):
 
-    print """<form action="webgui.py" method="POST">
+    print """<form action="/cgi-bin/webgui.py" method="POST">
         Show the temperature logs for
         <select name="timeinterval">"""
 
