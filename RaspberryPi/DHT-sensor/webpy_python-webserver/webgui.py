@@ -75,7 +75,8 @@ def print_graph_script(table):
 %s
         ]);
         var options = {
-          title: 'Temperature and Humidity'
+          title: 'Temperature and Humidity',
+          vAxis: {viewWindow:{min: 10}, gridlines: {count: 20}}
         };
         var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
         chart.draw(data, options);
