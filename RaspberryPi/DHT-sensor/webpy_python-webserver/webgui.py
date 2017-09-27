@@ -34,9 +34,9 @@ def get_data(interval):
     curs=conn.cursor()
 
     if interval == None:
-        curs.execute("SELECT timestamp,temp,humidity FROM trend")
+        curs.execute("SELECT datetime(timestamp, 'localtime'),temp,humidity FROM trend")
     else:
-        curs.execute("SELECT timestamp,temp,humidity FROM trend WHERE timestamp>datetime('now','-%s hours') AND timestamp<=datetime('now')" % interval)
+        curs.execute("SELECT datetime(timestamp, 'localtime'),temp,humidity FROM trend WHERE timestamp>datetime('now','-%s hours') AND timestamp<=datetime('now')" % interval)
 
     rows=curs.fetchall()
 
@@ -102,11 +102,11 @@ def show_stats(option):
     if option is None:
         option = str(24)
 
-    curs.execute("SELECT timestamp,max(temp) FROM trend WHERE timestamp>datetime('now','-%s hour') AND timestamp<=datetime('now')" % option)
+    curs.execute("SELECT datetime(timestamp, 'localtime'),max(temp) FROM trend WHERE timestamp>datetime('now','-%s hour') AND timestamp<=datetime('now')" % option)
     tempmax=curs.fetchone()
     tempmax="{0}&nbsp&nbsp&nbsp{1}C".format(str(tempmax[0]),str(tempmax[1]))
 
-    curs.execute("SELECT timestamp,min(temp) FROM trend WHERE timestamp>datetime('now','-%s hour') AND timestamp<=datetime('now')" % option)
+    curs.execute("SELECT datetime(timestamp, 'localtime'),min(temp) FROM trend WHERE timestamp>datetime('now','-%s hour') AND timestamp<=datetime('now')" % option)
     tempmin=curs.fetchone()
     tempmin="{0}&nbsp&nbsp&nbsp{1}C".format(str(tempmin[0]),str(tempmin[1]))
 
@@ -114,11 +114,11 @@ def show_stats(option):
     tempavg=curs.fetchone()
     tempavg="{0}C".format(str(tempavg[0]))
 
-    curs.execute("SELECT timestamp,max(humidity) FROM trend WHERE timestamp>datetime('now','-%s hour') AND timestamp<=datetime('now')" % option)
+    curs.execute("SELECT datetime(timestamp, 'localtime'),max(humidity) FROM trend WHERE timestamp>datetime('now','-%s hour') AND timestamp<=datetime('now')" % option)
     humiditymax=curs.fetchone()
     humiditymax="{0}&nbsp&nbsp&nbsp{1}%".format(str(humiditymax[0]),str(humiditymax[1]))
 
-    curs.execute("SELECT timestamp,min(humidity) FROM trend WHERE timestamp>datetime('now','-%s hour') AND timestamp<=datetime('now')" % option)
+    curs.execute("SELECT datetime(timestamp, 'localtime'),min(humidity) FROM trend WHERE timestamp>datetime('now','-%s hour') AND timestamp<=datetime('now')" % option)
     humiditymin=curs.fetchone()
     humiditymin="{0}&nbsp&nbsp&nbsp{1} C".format(str(humiditymin[0]),str(humiditymin[1]))
 
@@ -152,7 +152,7 @@ def show_stats(option):
     print "<table>"
     print "<tr><td><strong>Date/Time</strong></td><td><strong>Temperature</strong><td><strong>Humidity</strong></td></td></tr>"
 
-    rows=curs.execute("SELECT timestamp,temp,humidity FROM trend WHERE timestamp>datetime('now','-1 hour') AND timestamp<=datetime('now')")
+    rows=curs.execute("SELECT datetime(timestamp, 'localtime'),temp,humidity FROM trend WHERE timestamp>datetime('now','-1 hour') AND timestamp<=datetime('now')")
     for row in rows:
         tempstr="<tr><td>{0}&emsp;&emsp;</td><td>{1} C</td><td>{2} %</td></tr>".format(str(row[0]),str(row[1]),str(row[2]))
         print tempstr
