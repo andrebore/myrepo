@@ -2,6 +2,7 @@
 until [ "$SUCCESS" = "y" ] ;do
   echo "Insert room name"
   read room
+  room=$(echo "$room" | tr '[:upper:]' '[:lower:]')
   case $room in
     'living')
       roomid=1;
