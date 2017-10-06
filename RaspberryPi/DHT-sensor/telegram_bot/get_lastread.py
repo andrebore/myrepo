@@ -6,12 +6,12 @@ import cgi
 import cgitb
 
 # global variables
-dbname='/home/andrea/dhttrend.db' #path and db name here
+dbname='/home/andrea/dhtsensor/dhttrend_db/dhttrend.db' #path and db name here
 
 def get_lasttemp(room):
 	conn=sqlite3.connect(dbname)
 	curs=conn.cursor()
-	curs.execute("SELECT temp FROM trend WHERE timestamp>datetime('now','-1 hour') AND timestamp<=datetime('now') AND room=%i" % room)
+	curs.execute("SELECT temp FROM trend WHERE id=(select max(id) from trend) AND room=%i" % room)
 	t=curs.fetchone()
 	t="{0}C".format(str(t[0]))
 	conn.close()
@@ -20,7 +20,7 @@ def get_lasttemp(room):
 def get_lasthumidity(room):
 	conn=sqlite3.connect(dbname)
 	curs=conn.cursor()
-	curs.execute("SELECT humidity FROM trend WHERE timestamp>datetime('now','-1 hour') AND timestamp<=datetime('now') AND room=%i" % room)
+	curs.execute("SELECT humidity FROM trend WHERE id=(select max(id) from trend) AND room=%i" % room)
 	h=curs.fetchone()
 	h="{0}%".format(str(h[0]))
 	conn.close()
