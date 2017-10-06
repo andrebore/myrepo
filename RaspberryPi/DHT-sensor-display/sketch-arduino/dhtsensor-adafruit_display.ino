@@ -4,10 +4,10 @@
 #include <Adafruit_SSD1306.h>
 #include <DHT.h>
 
-#define OLED_RESET 2
+#define OLED_RESET 2  //d4 pin on d1 mini
 Adafruit_SSD1306 display(OLED_RESET);
 
-#define DHTPIN 0
+#define DHTPIN 0      //d3 pin on d1 mini
 #define DHTTYPE DHT22
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -16,18 +16,15 @@ void setup(){
   dht.begin();
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
   display.display();
-  delay(1000);
+  delay(2000);
 }
 
 void loop(){
 
   display.clearDisplay();
-  
+
   float temp = dht.readTemperature();
   float hum = dht.readHumidity();
-
-  Serial.println(temp);
-  Serial.println(hum);
 
   String tempstr = String(temp);
   String humstr = String(hum);
@@ -41,10 +38,8 @@ void loop(){
   display.setTextSize(2);
   display.setCursor(0,0);
   display.println(tempstr+" C");
-  //display.print("C");
   display.println(humstr +" %");
   display.display();
-  
-  delay(2000);
-}
 
+  delay(10000); //sleep for 10 seconds
+}
