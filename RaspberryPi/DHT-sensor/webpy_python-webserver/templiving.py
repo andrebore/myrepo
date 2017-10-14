@@ -6,7 +6,7 @@ import cgi
 import cgitb
 
 # global variables
-dbname='/home/andrea/dhtsensor/dhttrend_db/dhttrend.db'
+dbname='/home/andrea/dhtsensor/dhttrend_db/dhttrend.db' #path and db name here
 
 # print the HTTP header
 def printHTTPheader():
@@ -34,9 +34,9 @@ def get_data(interval):
     curs=conn.cursor()
 
     if interval == None:
-        curs.execute("SELECT * FROM trend")
+        curs.execute("SELECT datetime(timestamp, 'localtime'),temp,humidity FROM trend")
     else:
-        curs.execute("SELECT * FROM trend WHERE timestamp>datetime('now','-%s hours') AND timestamp<=datetime('now')" % interval)
+        curs.execute("SELECT datetime(timestamp, 'localtime'),temp,humidity FROM trend WHERE timestamp>datetime('now','-%s hours') AND timestamp<=datetime('now')" % interval)
 
     rows=curs.fetchall()
 
@@ -71,11 +71,12 @@ def print_graph_script(table):
       google.setOnLoadCallback(drawChart);
       function drawChart() {
         var data = google.visualization.arrayToDataTable([
-          ['Time', 'Humidity', 'Temperature'],
+          ['Time', 'Temperature', 'Humidity'],
 %s
         ]);
         var options = {
-          title: 'Temperature and Humidity'
+          title: 'Temperature and Humidity',
+          vAxis: {viewWindow:{min: 10}, gridlines: {count: 20}}
         };
         var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
         chart.draw(data, options);
@@ -89,7 +90,6 @@ def print_graph_script(table):
 
 # print the div that contains the graph
 def show_graph():
-    print "<h2>Temperature Chart</h2>"
     print '<div id="chart_div" style="width: 900px; height: 500px;"></div>'
 
 # connect to the db and show some stats
@@ -102,50 +102,55 @@ def show_stats(option):
     if option is None:
         option = str(24)
 
-    curs.execute("SELECT timestamp,max(temp) FROM trend WHERE timestamp>datetime('now','-%s hour') AND timestamp<=datetime('now')" % option)
+    curs.execute("SELECT datetime(timestamp, 'localtime'),max(temp) FROM trend WHERE timestamp>datetime('now','-%s hour') AND timestamp<=datetime('now')" % option)
     tempmax=curs.fetchone()
-    tempmax="{0}&nbsp&nbsp&nbsp{1} %".format(str(tempmax[0]),str(tempmax[1]))
+    tempmax="{0}&nbsp&nbsp&nbsp{1}C".format(str(tempmax[0]),str(tempmax[1]))
 
-    curs.execute("SELECT timestamp,min(temp) FROM trend WHERE timestamp>datetime('now','-%s hour') AND timestamp<=datetime('now')" % option)
+    curs.execute("SELECT datetime(timestamp, 'localtime'),min(temp) FROM trend WHERE timestamp>datetime('now','-%s hour') AND timestamp<=datetime('now')" % option)
     tempmin=curs.fetchone()
-    tempmin="{0}&nbsp&nbsp&nbsp{1} %".format(str(tempmin[0]),str(tempmin[1]))
+    tempmin="{0}&nbsp&nbsp&nbsp{1}C".format(str(tempmin[0]),str(tempmin[1]))
 
-    curs.execute("SELECT avg(temp) FROM trend WHERE timestamp>datetime('now','-%s hour') AND timestamp<=datetime('now')" % option)
+    curs.execute("SELECT ROUND(avg(temp),1) FROM trend WHERE timestamp>datetime('now','-%s hour') AND timestamp<=datetime('now')" % option)
     tempavg=curs.fetchone()
+    tempavg="{0}C".format(str(tempavg[0]))
 
-    curs.execute("SELECT timestamp,max(humidity) FROM trend WHERE timestamp>datetime('now','-%s hour') AND timestamp<=datetime('now')" % option)
+    curs.execute("SELECT datetime(timestamp, 'localtime'),max(humidity) FROM trend WHERE timestamp>datetime('now','-%s hour') AND timestamp<=datetime('now')" % option)
     humiditymax=curs.fetchone()
-    humiditymax="{0}&nbsp&nbsp&nbsp{1} C".format(str(humiditymax[0]),str(humiditymax[1]))
+    humiditymax="{0}&nbsp&nbsp&nbsp{1}%".format(str(humiditymax[0]),str(humiditymax[1]))
 
-    curs.execute("SELECT timestamp,min(humidity) FROM trend WHERE timestamp>datetime('now','-%s hour') AND timestamp<=datetime('now')" % option)
+    curs.execute("SELECT datetime(timestamp, 'localtime'),min(humidity) FROM trend WHERE timestamp>datetime('now','-%s hour') AND timestamp<=datetime('now')" % option)
     humiditymin=curs.fetchone()
-    humiditymin="{0}&nbsp&nbsp&nbsp{1} C".format(str(humiditymin[0]),str(humiditymin[1]))
+    humiditymin="{0}&nbsp&nbsp&nbsp{1}%".format(str(humiditymin[0]),str(humiditymin[1]))
 
-    curs.execute("SELECT avg(humidity) FROM trend WHERE timestamp>datetime('now','-%s hour') AND timestamp<=datetime('now')" % option)
+    curs.execute("SELECT ROUND(avg(humidity),1) FROM trend WHERE timestamp>datetime('now','-%s hour') AND timestamp<=datetime('now')" % option)
     humidityavg=curs.fetchone()
+    humidityavg="{0}%".format(str(humidityavg[0]))
 
 
     print "<hr>"
 
 
-    print "<h2>Minumum Value&nbsp</h2>"
+    print "<h2>Minumum value&nbsp</h2>"
     print tempmin
+    print "<p></p>"
     print humiditymin
-    print "<h2>Maximum Value</h2>"
+    print "<h2>Maximum value</h2>"
     print tempmax
+    print "<p></p>"
     print humiditymax
-    print "<h2>Average Value</h2>"
-    print "%.1f" % tempavg+"%"
-    print "%.1f" % humidityavg+"C"
+    print "<h2>Average value</h2>"
+    print tempavg
+    print "<p></p>"
+    print humidityavg
     print "<hr>"
 
     print "<h2>In the last hour:</h2>"
     print "<table>"
     print "<tr><td><strong>Date/Time</strong></td><td><strong>Temperature</strong><td><strong>Humidity</strong></td></td></tr>"
 
-    rows=curs.execute("SELECT * FROM trend WHERE timestamp>datetime('now','-1 hour') AND timestamp<=datetime('now')")
+    rows=curs.execute("SELECT datetime(timestamp, 'localtime'),temp,humidity FROM trend WHERE timestamp>datetime('now','-1 hour') AND timestamp<=datetime('now')")
     for row in rows:
-        tempstr="<tr><td>{0}&emsp;&emsp;</td><td>{1} %</td><td>{2} C</td></tr>".format(str(row[0]),str(row[1]),str(row[2]))
+        tempstr="<tr><td>{0}&emsp;&emsp;</td><td>{1} C</td><td>{2} %</td></tr>".format(str(row[0]),str(row[1]),str(row[2]))
         print tempstr
     print "</table>"
 
@@ -155,7 +160,7 @@ def show_stats(option):
 
 def print_time_selector(option):
 
-    print """<form action="/cgi-bin/webgui.py" method="POST">
+    print """<form action="templiving.py" method="POST">
         Show the temperature logs for
         <select name="timeinterval">"""
 
@@ -178,15 +183,15 @@ def print_time_selector(option):
             print "<option value=\"24\">the last 24 hours</option>"
 
         if option == "168":
-            print "<option value=\"168\" selected=\"selected\">the last 168 hours</option>"
+            print "<option value=\"168\" selected=\"selected\">the last week</option>"
         else:
-            print "<option value=\"168\">the last 168 hours</option>"
+            print "<option value=\"168\">the last week</option>"
 
     else:
         print """<option value="6">the last 6 hours</option>
             <option value="12">the last 12 hours</option>
             <option value="24">the last 24 hours</option>
-            <option value="168">the last 168 hours</option>"""
+            <option value="168">the last week</option>"""
 
     print """        </select>
         <input type="submit" value="Display">
@@ -199,7 +204,7 @@ def validate_input(option_str):
     # check that the option string represents a number
     if option_str.isalnum():
         # check that the option is within a specific range
-        if int(option_str) > 0 and int(option_str) <= 24:
+        if int(option_str) > 0 and int(option_str) <= 168:
             return option_str
         else:
             return None
@@ -245,11 +250,11 @@ def main():
     print "<html>"
     # print the head section including the table
     # used by the javascript for the chart
-    printHTMLHead("Raspberry Pi Temperature and Humidity Logger", table)
+    printHTMLHead("Livingroom temperature and humidity trend", table)
 
     # print the page body
     print "<body>"
-    print "<h1>Raspberry Pi Temperature and Humidity Logger</h1>"
+    print "<h1>Livingroom temperature and humidity trend</h1>"
     print "<hr>"
     print_time_selector(option)
     show_graph()
