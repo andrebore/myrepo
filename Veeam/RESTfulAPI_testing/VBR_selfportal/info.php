@@ -1,0 +1,2 @@
+'<?php phpinfo() ?>'
+<!doctype html>

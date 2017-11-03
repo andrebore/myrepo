@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<dwsync>
+<file name="functions_include.php" server="172.16.1.11//var/www/itlabrestapi01-testing.veeamita.local/public_html/" local="131426310490000000" remote="131426310490000000" Dst="2" />
+<file name="functions.php" server="172.16.1.11//var/www/itlabrestapi01-testing.veeamita.local/public_html/" local="131426310490000000" remote="131426310490000000" Dst="2" />
+<file name="Client.php" server="172.16.1.11//var/www/itlabrestapi01-testing.veeamita.local/public_html/" local="131426310490000000" remote="131426310490000000" Dst="2" />
+<file name="ClientInterface.php" server="172.16.1.11//var/www/itlabrestapi01-testing.veeamita.local/public_html/" local="131426310490000000" remote="131426310490000000" Dst="2" />
+<file name="HandlerStack.php" server="172.16.1.11//var/www/itlabrestapi01-testing.veeamita.local/public_html/" local="131426310490000000" remote="131426310490000000" Dst="2" />
+<file name="Middleware.php" server="172.16.1.11//var/www/itlabrestapi01-testing.veeamita.local/public_html/" local="131426310490000000" remote="131426310490000000" Dst="2" />
+<file name="RedirectMiddleware.php" server="172.16.1.11//var/www/itlabrestapi01-testing.veeamita.local/public_html/" local="131426310490000000" remote="131426310490000000" Dst="2" />
+<file name="RequestOptions.php" server="172.16.1.11//var/www/itlabrestapi01-testing.veeamita.local/public_html/" local="131426310490000000" remote="131426310490000000" Dst="2" />
+<file name="PrepareBodyMiddleware.php" server="172.16.1.11//var/www/itlabrestapi01-testing.veeamita.local/public_html/" local="131426310490000000" remote="131426310490000000" Dst="2" />
+</dwsync>
