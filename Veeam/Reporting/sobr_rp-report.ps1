@@ -1,4 +1,3 @@
-#where's my restore points?
 #report per vedere in quale extent sono gli ultimi 3 restore point di una VM
 
 
