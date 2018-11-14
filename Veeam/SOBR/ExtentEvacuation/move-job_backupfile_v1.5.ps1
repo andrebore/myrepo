@@ -2,79 +2,79 @@
 
 function Show-Options
 {
-    [CmdletBinding()]
+  [CmdletBinding()]
 
-    param(
-        [Parameter(Mandatory=$true)]
-        [string]
-        $Message,
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]
+    $Message,
 
-        [Parameter(Mandatory=$true)]
-        [string[]]
-        $Options
-    )
+    [Parameter(Mandatory = $true)]
+    [string[]]
+    $Options
+  )
 
-    Write-Host -Object "`n$Message`n"
-    foreach ($option in $Options)
-    {
-        Write-Host -Object "`t[$($Options.IndexOf($option) + 1)] $($option)"
-    }
+  Write-Host -Object "`n$Message`n"
+  foreach ($option in $Options)
+  {
+    Write-Host -Object "`t[$($Options.IndexOf($option) + 1)] $($option)"
+  }
 }
 
 function Get-UserChoice
 {
-    [CmdletBinding()]
+  [CmdletBinding()]
 
-    param(
-        [Parameter(Mandatory=$true)]
-        [string]
-        $Message,
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]
+    $Message,
 
-        [Parameter(Mandatory=$true)]
-        [string[]]
-        $Options
-    )
+    [Parameter(Mandatory = $true)]
+    [string[]]
+    $Options
+  )
 
-    $inputIsValid = $false
-    do
+  $inputIsValid = $false
+  do
+  {
+    try
     {
-        try
-        {
-            [int]$userInput = (Read-Host -Prompt "`n$Message")
-        }
-        catch
-        {
-            Write-Host -Object "Invalid input! Must be an integer."
-            continue
-        }
-        if ($userInput -ge 1 -and $userInput -le $Options.Length)
-        {
-            $inputIsValid = $true
-        }
-        else
-        {
-            Write-Host -Object "Invalid input! Must be in the range 1..$($Options.Length)."
-        }
+      [int]$userInput = (Read-Host -Prompt "`n$Message")
     }
-    until ($inputIsValid)
+    catch
+    {
+      Write-Host -Object "Invalid input! Must be an integer."
+      continue
+    }
+    if ($userInput -ge 1 -and $userInput -le $Options.Length)
+    {
+      $inputIsValid = $true
+    }
+    else
+    {
+      Write-Host -Object "Invalid input! Must be in the range 1..$($Options.Length)."
+    }
+  }
+  until ($inputIsValid)
 
-    return $userInput - 1
+  return $userInput - 1
 }
 
 function Get-RepositoryFreeSpace
 {
-    [CmdletBinding()]
+  [CmdletBinding()]
 
-    param(
-        [Parameter(Mandatory=$true)]
-        [Veeam.Backup.Core.CBackupRepository]
-        $Repository
-    )
+  param(
+    [Parameter(Mandatory = $true)]
+    [Veeam.Backup.Core.CBackupRepository]
+    $Repository
+  )
 
-    $repoAccessor = [Veeam.Backup.Core.CRepositoryAccessorFactory]::Create($Repository)
-    $fsDriveInfo = $repoAccessor.FileCommander.FindDirInfo($Repository.FriendlyPath)
+  $repoAccessor = [Veeam.Backup.Core.CRepositoryAccessorFactory]::Create($Repository)
+  $fsDriveInfo = $repoAccessor.FileCommander.FindDirInfo($Repository.FriendlyPath)
 
-    return $fsDriveInfo.FreeSpace
+  return $fsDriveInfo.FreeSpace
 
 }
 
@@ -82,8 +82,8 @@ $allRepos = Get-VBRBackupRepository -ScaleOut
 
 if (!$allRepos)
 {
-    Write-Host -Object "Backup server has no scale-out repositories."
-    return
+  Write-Host -Object "Backup server has no scale-out repositories."
+  return
 }
 
 Show-Options -Message "Scale-out repositories:" -Options $allRepos.Name
@@ -100,39 +100,39 @@ $extentWithBackups = New-Object -TypeName System.Collections.Generic.List[PSCust
 
 $sourceExtentAccessor = [Veeam.Backup.Core.CRepositoryAccessorFactory]::Create($sourceExtent.Repository)
 $jobs = Get-VBRJob
-foreach ($job in $jobs | where-Object {$_.FindTargetRepository().id -eq $repo.id}){
-    $jobFolderPath = [Veeam.Backup.Model.SPathConverter]::RepositoryPathToString(
-        $sourceExtent.Repository.FullPath.Combine($job.TargetFile),
-        $sourceExtent.Repository.Type
-    )
+foreach ($job in $jobs | Where-Object { $_.FindTargetRepository().Id -eq $repo.Id }) {
+  $jobFolderPath = [Veeam.Backup.Model.SPathConverter]::RepositoryPathToString(
+    $sourceExtent.Repository.FullPath.Combine($job.TargetFile),
+    $sourceExtent.Repository.type
+  )
 
-    if ($sourceExtentAccessor.FileCommander.IsExists($jobFolderPath))
-    {
-        $jobFolderSize = $sourceExtentAccessor.FileCommander.GetDirSize($jobFolderPath)
+  if ($sourceExtentAccessor.FileCommander.IsExists($jobFolderPath))
+  {
+    $jobFolderSize = $sourceExtentAccessor.FileCommander.GetDirSize($jobFolderPath)
+  }
+  else
+  {
+    $jobFolderSize = 0
+  }
+  if ($jobFolderSize)
+  {
+    $jobStats = [pscustomobject]@{
+      jobName = $job.Name.ToString();
+      jobFolder = $jobFolderPath.ToString();
+      jobFolderSize = $jobFolderSize
     }
-    else
-    {
-        $jobFolderSize = 0
-    }
-    if ($jobFolderSize)
-    {
-        $jobStats = [PSCustomObject]@{
-            jobName = $job.Name.ToString();
-            jobFolder = $jobFolderPath.ToString();
-            jobFolderSize = $jobFolderSize
-        }
-        $extentWithBackups.Add($jobStats)
-    }
+    $extentWithBackups.Add($jobStats)
+  }
 }
 
 if (!$extentWithBackups)
 {
-    Write-Host -Object "`n[$($sourceExtent.Name)] has no backups."
-    return
+  Write-Host -Object "`n[$($sourceExtent.Name)] has no backups."
+  return
 }
 
 Show-Options -Message "[$($sourceExtent.Name)] > Extent with backups:" -Options ($extentWithBackups |
-    ForEach-Object -Process {"$($_.jobName) ($([System.Math]::Round($_.jobFolderSize / 1GB, 2)) GB used)"})
+  ForEach-Object -Process { "$($_.jobName) ($([System.Math]::Round($_.jobFolderSize / 1GB, 2)) GB used)" })
 
 $jobIndex = Get-UserChoice -Message "Choose a job" -Options $extentWithBackups
 
@@ -162,12 +162,12 @@ if (!$tenantIsDisabled)
 Write-Host -Object "[$($tenantsWithBackups[$tenantIndex].tenantName)] has been disabled."
 #>
 
-$possibleTargetExtents = $repo.Extent | Where-Object -FilterScript {$_.Id -ne $sourceExtent.Id}
+$possibleTargetExtents = $repo.Extent | Where-Object -FilterScript { $_.Id -ne $sourceExtent.Id }
 
 Show-Options -Message "[$($repo.Name)] > Extents:" -Options ($possibleTargetExtents |
-    ForEach-Object -Process {
-        "$($_.Name) ($([System.Math]::Round((Get-RepositoryFreeSpace -Repository $_.Repository) / 1GB, 2)) GB free)"
-    })
+  ForEach-Object -Process {
+    "$($_.Name) ($([System.Math]::Round((Get-RepositoryFreeSpace -Repository $_.Repository) / 1GB, 2)) GB free)"
+  })
 
 $targetExtentIndex = Get-UserChoice -Message "Choose a target extent" -Options $possibleTargetExtents.Name
 $targetExtent = $possibleTargetExtents[$targetExtentIndex]
@@ -175,53 +175,53 @@ $targetExtent = $possibleTargetExtents[$targetExtentIndex]
 $targetExtentFreeSpace = Get-RepositoryFreeSpace -Repository $targetExtent.Repository
 if ($targetExtentFreeSpace -lt $extentWithBackups[$jobIndex].tenantFolderSize)
 {
-    Write-Host -Object "`nThere is not enough free space on [$($targetExtent.Name)]."
-    return
-} else{
-    Write-Host -Object "`nCi sta!"
-    }
+  Write-Host -Object "`nThere is not enough free space on [$($targetExtent.Name)]."
+  return
+} else {
+  Write-Host -Object "`nCi sta!"
+}
 
 #$jobSrc = [System.IO.File]::ReadAllText("$PSScriptRoot\job_src.ps1")
 $jobSrc = [System.IO.File]::ReadAllText("$PSScriptRoot\job_src_v1.5.ps1")
-[Veeam.Backup.Common.CStringCoder]::Code($jobSrc, $true) | Out-File -FilePath "$PSScriptRoot\job.txt"
+[Veeam.Backup.Common.CStringCoder]::Code($jobSrc,$true) | Out-File -FilePath "$PSScriptRoot\job.txt"
 
 $jobDescription = "Job will move [{0}] backup files from [{1}] to [{2}]" -f
-    $extentWithBackups[$jobIndex].jobName,
-    $sourceExtent.Name,
-    $targetExtent.Name
+$extentWithBackups[$jobIndex].jobName,
+$sourceExtent.Name,
+$targetExtent.Name
 
 #### Fin qui tutto bene!
 
 $jobParams = New-Object -TypeName 'System.Collections.Generic.Dictionary[string, string]'
 $jobParams.Add(
-    "JobName", [Veeam.Backup.Common.CStringCoder]::Code($extentWithBackups[$jobIndex].jobName, $true)
+  "JobName",[Veeam.Backup.Common.CStringCoder]::Code($extentWithBackups[$jobIndex].jobName,$true)
 )
-$jobParams.Add("SobrId", [Veeam.Backup.Common.CStringCoder]::Code($repo.Id.ToString(), $true))
+$jobParams.Add("SobrId",[Veeam.Backup.Common.CStringCoder]::Code($repo.Id.ToString(),$true))
 $jobParams.Add(
-    "SourceExtentId", [Veeam.Backup.Common.CStringCoder]::Code($sourceExtent.Repository.Id.ToString(), $true)
-)
-$jobParams.Add(
-    "JobFolder",
-    [Veeam.Backup.Common.CStringCoder]::Code($extentWithBackups[$jobIndex].jobName, $true)
+  "SourceExtentId",[Veeam.Backup.Common.CStringCoder]::Code($sourceExtent.Repository.Id.ToString(),$true)
 )
 $jobParams.Add(
-    "TargetExtentId", [Veeam.Backup.Common.CStringCoder]::Code($targetExtent.Repository.Id.ToString(), $true)
+  "JobFolder",
+  [Veeam.Backup.Common.CStringCoder]::Code($extentWithBackups[$jobIndex].jobName,$true)
+)
+$jobParams.Add(
+  "TargetExtentId",[Veeam.Backup.Common.CStringCoder]::Code($targetExtent.Repository.Id.ToString(),$true)
 )
 $jobSpecArgs = @{
-    name = "Move Backup Files";
-    description = $jobDescription;
-    type = [Veeam.Backup.Model.CPowerShellScriptJobSpec+EResourcesType]::Script;
-    resources = @("$PSScriptRoot\job.txt");
-    parameters = $jobParams
+  Name = "Move Backup Files";
+  description = $jobDescription;
+  type = [Veeam.Backup.Model.CPowerShellScriptJobSpec+EResourcesType]::Script;
+  resources = @("$PSScriptRoot\job.txt");
+  parameters = $jobParams
 }
 $jobSpec = [Veeam.Backup.Model.CPowerShellScriptJobSpec]::Create(
-    $jobSpecArgs.name,
-    $jobSpecArgs.description,
-    $jobSpecArgs.type,
-    $jobSpecArgs.resources,
-    $jobSpecArgs.parameters
+  $jobSpecArgs.Name,
+  $jobSpecArgs.description,
+  $jobSpecArgs.type,
+  $jobSpecArgs.resources,
+  $jobSpecArgs.parameters
 )
-$jobManagementService = [Veeam.Backup.Core.SVeeamBackupService]::Instance.Session.GetJobManagementService()
+$jobManagementService = [Veeam.Backup.Core.SVeeamBackupService]::Instance.session.GetJobManagementService()
 [void]$jobManagementService.StartPowerShellScriptJob($jobSpec)
 
 Write-Host -Object "`nJob has been started. Job log is available in the VB&R console > HISTORY > Orchestrated Tasks."
