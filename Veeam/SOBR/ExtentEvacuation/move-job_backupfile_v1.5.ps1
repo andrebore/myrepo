@@ -182,7 +182,7 @@ if ($targetExtentFreeSpace -lt $extentWithBackups[$jobIndex].tenantFolderSize)
     }
 
 #$jobSrc = [System.IO.File]::ReadAllText("$PSScriptRoot\job_src.ps1")
-$jobSrc = [System.IO.File]::ReadAllText("$PSScriptRoot\job_src_v1.ps1")
+$jobSrc = [System.IO.File]::ReadAllText("$PSScriptRoot\job_src_v1.5.ps1")
 [Veeam.Backup.Common.CStringCoder]::Code($jobSrc, $true) | Out-File -FilePath "$PSScriptRoot\job.txt"
 
 $jobDescription = "Job will move [{0}] backup files from [{1}] to [{2}]" -f
