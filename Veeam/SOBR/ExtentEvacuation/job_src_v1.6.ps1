@@ -612,18 +612,14 @@ $sourceExtentAccessor = [Veeam.Backup.Core.CRepositoryAccessorFactory]::Create($
 $targetExtentAccessor = [Veeam.Backup.Core.CRepositoryAccessorFactory]::Create($targetExtent)
 
 $jobFolderPath = [Veeam.Backup.Core.CFileCommanderHelper]::CombinePath($sourceExtent.FriendlyPath,$JobFolder)
-#foreach ($folder in $sourceExtentAccessor.FileCommander.EnumItems($jobFolderPath))
-#{
-#if ($sourceExtentAccessor.FileCommander.GetDirSize($folder.FullName))
+
 if ($sourceExtentAccessor.FileCommander.GetDirSize($jobFolderPath))
 {
-	#Write-Host -Object "Started processing backup files in [$($folder.Name)]."
 	Write-Host -Object "Started processing backup files in [$($JobFolder)]."
 
 	$storageFiles = New-Object -TypeName System.Collections.Generic.List[string]
 	$sourceMetaFile = $null
 
-	#foreach ($file in $sourceExtentAccessor.FileCommander.EnumItems($folder.FullName))
 	foreach ($file in $sourceExtentAccessor.FileCommander.EnumItems($jobFolderPath))
 	{
 		if ($file.Name.EndsWith("vbm"))
@@ -708,8 +704,23 @@ if ($sourceExtentAccessor.FileCommander.GetDirSize($jobFolderPath))
 				Write-Host -Object "[$($sourceFilePath.Elements[-1])] has been copied."
 			}
 		}
+
+         $targetFile = [Veeam.Backup.Core.CFileCommanderHelper]::CombinePath(
+            $targetExtent.FriendlyPath,
+		    $JobFolder,
+            $_.Name
+        )
+
 		Copy-StorageFiles -Sobr $sobr -SourceExtentAccessor $sourceExtentAccessor -Files $_ -TargetExtentAccessor $targetExtentAccessor
-	}
+
+        if ($targetExtentAccessor.FileCommander.IsExists($targetFile) -and $? -eq $true){
+            $sourceExtentAccessor.FileCommander.DeleteFile($_)
+            Write-Host -Object "Source backup file $($_) has been deleted."
+	    } else {
+            Write-Host -Object "Source backup file $($_) has not been copied successfully!!!"
+        }
+
+    }
 
 	$targetMetaFilePath = [Veeam.Backup.Core.CFileCommanderHelper]::CombinePath(
 		$targetExtent.FriendlyPath,
@@ -720,20 +731,16 @@ if ($sourceExtentAccessor.FileCommander.GetDirSize($jobFolderPath))
 	Copy-Metadata -SourceExtentAccessor $sourceExtentAccessor -SourceFilePath $sourceMetaFile.FullName `
  		-TargetExtentAccessor $targetExtentAccessor -TargetFilePath $targetMetaFilePath
 
-	foreach ($file in $storageFiles)
-	{
-		$sourceExtentAccessor.FileCommander.DeleteFile($file)
-	}
-	$sourceExtentAccessor.FileCommander.DeleteFile($sourceMetaFile.FullName)
-	Write-Host -Object "Source backup files have been deleted."
+	if ($targetExtentAccessor.FileCommander.IsExists($targetMetaFilePath) -and $? -eq $true){
+	    $sourceExtentAccessor.FileCommander.DeleteFile($sourceMetaFile.FullName)
+	    Write-Host -Object "Source vmb file $($targetMetaFilePath) has been deleted."
+    } else {
+					Write-Host -Object "Source vbm file $($targetMetaFilePath) has not been copied successfully!!!"
+			}
 }
-#}
 
 $rescanSession = Sync-VBRBackupRepository -Repository $sobr
 [Veeam.Backup.Core.CBaseSession]::Wait4Complete($rescanSession.Id)
 Write-Host -Object "[$($sobr.Name)] has been rescanned."
-
-#Get-VBRCloudTenant -Name $TenantName | Enable-VBRCloudTenant
-#Write-Host -Object "[$TenantName] has been enabled."
 
 [Veeam.Backup.SSH.CSshConnection]::ClearCache()

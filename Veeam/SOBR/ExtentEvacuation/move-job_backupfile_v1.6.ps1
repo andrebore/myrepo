@@ -137,16 +137,20 @@ Show-Options -Message "[$($sourceExtent.Name)] > Backup job in this extent:" -Op
 $jobIndex = Get-UserChoice -Message "Choose the job you want to migrate" -Options $extentWithBackups
 
 #Check whether the job is running or not
-$jobisstopped = $job.IsStopped()
+##   DEVO USARE QUESTA: $extentWithBackups[$jobIndex].jobName
+
+$jobtostop = Get-VBRJob -Name $extentWithBackups[$jobIndex].jobName
+$jobisstopped = $jobtostop.IsStopped()
 if ($jobisstopped) {
-  Write-Host -Object "`nDisabling job $($job.Name)"
-  $job | Disable-VBRJob | Out-null
+  Write-Host -Object "`nDisabling job $($jobtostop.Name)"
+  $jobtostop | Disable-VBRJob | Out-null
 } else {
-  Write-host -Object "`n$($job.Name) is either running or not in stopped state, exiting..."
+  Write-host -Object "`n$($jobtostop.Name) is either running or not in stopped state, exiting..."
   return
 }
 
-Write-Host -Object "`nJob $($job.Name) has been disabled"
+Write-Host -Object "`nJob $($jobs[$jobindex].Name) has been disabled"
+
 #End check - if the job has been disabled then continue
 
 $possibleTargetExtents = $repo.Extent | Where-Object -FilterScript { $_.Id -ne $sourceExtent.Id }
