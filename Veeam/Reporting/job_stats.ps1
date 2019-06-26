@@ -2,9 +2,9 @@
 
 $today=get-date
 
-foreach ($job in Get-VBRJob -name "SOBR_Backup02"){
+foreach ($job in Get-VBRJob -name "xxxxxxx"){
     
-    (Get-VBRBackup -Name "SOBR_Backup02").GetAllStorages() | where-object {$_.CreationTime -gt $today.AddDays(-1)} | Select-Object -Property `
+    (Get-VBRBackup -Name $job.Name).GetAllStorages() | where-object {$_.CreationTime -gt $today.AddDays(-1)} | Select-Object -Property `
         @{N="BackupJob";E={$job.Name}},`
         @{N="Name";E={$_.FilePath}},`
         @{N="Date";E={$_.CreationTime}},`
