@@ -1,4 +1,4 @@
-asnp VeeamPSSnapIn
+Add-PSSnapIn VeeamPSSnapIn
 
 $Job = Get-VBRJob -name "Name of backup job"
 $Options = $Job.GetOptions()
