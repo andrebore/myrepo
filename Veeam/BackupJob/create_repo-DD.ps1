@@ -1,4 +1,4 @@
-﻿asnp VeeamPsSnapin
+﻿Add-PSSnapIn VeeamPsSnapin
 
 $bckserver = get-vbrserver -name "backup server"
 $mountserver1 = get-vbrserver -name "mount server 1"
