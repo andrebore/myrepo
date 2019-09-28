@@ -11,9 +11,8 @@ for ($Index = 0; $Index -lt $length; $Index += $SplitSize)
 }
 }
 
-$object = Find-VBRViEntity -VMsAndTemplates -Name ##### | Sort-Object -Property -Name
-$objectrnd = $object | Sort-Object { Get-Random }
-$vmlist = Split-Array -InputObject $objectrnd -SplitSize 10 #Defines how many VMs per job
+$object = Find-VBRViEntity -VMsAndTemplates -Name cedacri* | Where-Object { $_.Name -notin $exclusions } | Sort-Object { Get-Random }
+$vmlist = Split-Array -InputObject $object -SplitSize 10
 
 $repo = Get-VBRBackupRepository -Name #####
 $drhost = Get-VBRServer -Name ####
