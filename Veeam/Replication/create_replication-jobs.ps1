@@ -1,14 +1,12 @@
 ﻿Add-PSSnapin -Name VeeamPSsnapin
 
-function Split-Array ([object[]]$InputObject,[int]$SplitSize)
-{
-$length=$InputObject.Length
-for ($Index = 0; $Index -lt $length; $Index += $SplitSize)
-{
-#, encapsulates result in array
-#-1 because we index the array from 0
-,($InputObject[$index..($index+$splitSize-1)])
-}
+function Split-Array ([object[]]$InputObject, [int]$SplitSize) {
+    $length = $InputObject.Length
+    for ($Index = 0; $Index -lt $length; $Index += $SplitSize) {
+        #, encapsulates result in array
+        #-1 because we index the array from 0
+        , ($InputObject[$index..($index + $splitSize - 1)])
+    }
 }
 
 $object = Find-VBRViEntity -VMsAndTemplates -Name cedacri* | Where-Object { $_.Name -notin $exclusions } | Sort-Object { Get-Random }
@@ -22,16 +20,16 @@ $minutes = 0
 
 #Network mapping
 $server = Get-VBRServer -Type ESXi -Name ####
-$srcnet1 = Get-VBRViServerNetworkInfo -Server $server | Where-Object {$_.NetworkName -eq '####'}
-$tgtnet1 = Get-VBRViServerNetworkInfo -Server $server | Where-Object {$_.NetworkName -eq '####'}
-$srcnet2 = Get-VBRViServerNetworkInfo -Server $server | Where-Object {$_.NetworkName -eq '####'}
-$tgtnet2 = Get-VBRViServerNetworkInfo -Server $server | Where-Object {$_.NetworkName -eq '####'}
+$srcnet1 = Get-VBRViServerNetworkInfo -Server $server | Where-Object { $_.NetworkName -eq '####' }
+$tgtnet1 = Get-VBRViServerNetworkInfo -Server $server | Where-Object { $_.NetworkName -eq '####' }
+$srcnet2 = Get-VBRViServerNetworkInfo -Server $server | Where-Object { $_.NetworkName -eq '####' }
+$tgtnet2 = Get-VBRViServerNetworkInfo -Server $server | Where-Object { $_.NetworkName -eq '####' }
 
 #Job creation
-$i=0
-while ($i -lt $vmlist.Count){
+$i = 0
+while ($i -lt $vmlist.Count) {
     $jobname = '####' + "{0:D2}" -f $i
-    Add-VBRViReplicaJob -Name $jobname -Server $drhost -Entity $vmlist[$i] -BackupRepository $repo -RestorePointsToKeep 2 -EnableNetworkMapping -SourceNetwork $srcnet1,$srcnet2 -TargetNetwork $tgtnet1,$tgtnet2
+    Add-VBRViReplicaJob -Name $jobname -Server $drhost -Entity $vmlist[$i] -BackupRepository $repo -RestorePointsToKeep 2 -EnableNetworkMapping -SourceNetwork $srcnet1, $srcnet2 -TargetNetwork $tgtnet1, $tgtnet2
     $i++
 }
 
