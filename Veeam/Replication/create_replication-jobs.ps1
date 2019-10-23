@@ -9,7 +9,7 @@ function Split-Array ([object[]]$InputObject, [int]$SplitSize) {
     }
 }
 
-$object = Find-VBRViEntity -VMsAndTemplates -Name cedacri* | Where-Object { $_.Name -notin $exclusions } | Sort-Object { Get-Random }
+$object = Find-VBRViEntity -VMsAndTemplates -Name 'filter***' | Where-Object { $_.Name -notin $exclusions } | Sort-Object { Get-Random }
 $vmlist = Split-Array -InputObject $object -SplitSize 10
 
 $repo = Get-VBRBackupRepository -Name #####
